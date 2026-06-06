@@ -1,0 +1,119 @@
+# =====================================================================
+# SynergyEventSphere monorepo .gitignore
+# Covers: Spring Boot (Gradle / Java) + React (Vite / TypeScript / Node)
+# =====================================================================
+
+# ------------------------- OS / Editor -------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.code-workspace
+.fleet/
+.project
+.classpath
+.settings/
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+.apt_generated
+.factorypath
+
+# ------------------------- Secrets -------------------------
+# Real secrets live in local dotfiles and must never be committed.
+# Only tracked templates (e.g. .env.example) are kept in source control.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# ------------------------- Logs -------------------------
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ------------------------- Java / Spring Boot / Gradle -------------------------
+# Build outputs
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+target/
+*.class
+
+# Gradle
+.gradle/
+gradle-app.setting
+
+# Maven (in case it ever shows up)
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot HELP file (regenerated)
+HELP.md
+
+# ------------------------- NetBeans -------------------------
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ------------------------- Node / React / Vite -------------------------
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+.yarn/cache
+.yarn/build-state.yml
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+.vite/
+.turbo/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+
+# Test / coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Vite + tooling caches
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+
+# ------------------------- Postman -------------------------
+# Local-only Postman assets (generator script + exported collections).
+ses-backend/postman/
+
+# ------------------------- Misc tooling -------------------------
+.husky/_
+
+# Local toolchain helpers (e.g. bootstrapped pnpm binary on machines
+# without a system-installed package manager). Must never be committed.
+.tools/
+.pnpm-store/

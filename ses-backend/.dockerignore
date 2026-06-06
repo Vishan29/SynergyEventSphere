@@ -1,0 +1,28 @@
+# Gradle outputs / caches (rebuilt inside the image).
+build/
+.gradle/
+
+# IDE / editor scaffolding.
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Local secrets — must never enter the image.
+.env
+.env.*
+!.env.example
+
+# OS junk + logs.
+.DS_Store
+Thumbs.db
+*.log
+
+# Docs and ancillary assets that aren't needed at runtime.
+HELP.md
+postman/
+
+# Don't recursively COPY a Dockerfile into itself.
+Dockerfile
+.dockerignore

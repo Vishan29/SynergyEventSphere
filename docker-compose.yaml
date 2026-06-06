@@ -1,0 +1,81 @@
+# SynergyEventSphere — local development & demo stack.
+#
+# Brings up Postgres + Spring Boot API + nginx-served React SPA on one
+# bridge network. The frontend container reverse-proxies /api/* to the
+# backend, so the browser only talks to a single origin.
+#
+# Quick start:
+#     # 1. Put a JWT signing secret in a root-level `.env` (git-ignored):
+#     echo "APP_JWT_SECRET=$(openssl rand -base64 48)" > .env
+#     # 2. Build + run everything:
+#     docker compose up --build
+#     # 3. Open http://localhost:5173
+#
+# Override any of the variables referenced below in that same `.env` file
+# (Docker Compose loads it automatically) or via shell env vars.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: ses-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-eventsphere}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      # Exposed on the host so you can poke at the DB with psql / a GUI.
+      # Remove this block to keep Postgres internal to the compose network.
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER:-postgres}" -d "$${POSTGRES_DB:-eventsphere}"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  backend:
+    build:
+      context: ./ses-backend
+    image: ses-backend:local
+    container_name: ses-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Spring Boot's relaxed binding maps these env vars onto the
+      # spring.datasource.* / app.jwt.* properties used in application.yaml.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-eventsphere}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      # Required — compose fails fast with this message if it's unset/empty.
+      APP_JWT_SECRET: ${APP_JWT_SECRET:?APP_JWT_SECRET must be set; generate one with `openssl rand -base64 48`}
+      APP_JWT_EXPIRATION_MS: ${APP_JWT_EXPIRATION_MS:-3600000}
+      JAVA_OPTS: ${JAVA_OPTS:-}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+
+  frontend:
+    build:
+      context: ./ses-frontend
+      args:
+        # Empty base URL => browser hits /api on its own origin, which the
+        # bundled nginx reverse-proxies to the backend service.
+        VITE_API_BASE_URL: ""
+        VITE_OAUTH_ENABLED: ${VITE_OAUTH_ENABLED:-false}
+    image: ses-frontend:local
+    container_name: ses-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+
+volumes:
+  db-data:
+    name: ses-db-data
