@@ -14,7 +14,7 @@
 #   VITE_OAUTH_ENABLED - "true"/"false". Mirrors .env.example.
 
 # ---- Build stage --------------------------------------------------------
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 WORKDIR /app
 
 # Corepack ships with Node 16+ and lets us use the pnpm version pinned in
